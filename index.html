@@ -1,0 +1,462 @@
+<!doctype html>
+<!--
+  ================================================================
+   NEFARIOUS EMPIRE // infobot firmware — NefariOS 2.3  (unit NX-7)
+   property of the Empire. ALL HAIL EMPEROR NEFARIOUS.
+   unauthorized access is punishable by a one-way rift to Zordoom Prison.
+  ================================================================
+   ...and yet here you are, reading the firmware. the locks were painted on.
+   (shipped fast, one password for the whole dimension, no real backend.
+    the Empire cuts corners. we noticed. we always do.)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>veldin.dev // AnnoyingP0ny</title>
+<meta name="description" content="AnnoyingP0ny — offensive security and infrastructure research. Transmitting from Veldin.">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="veldin.dev // AnnoyingP0ny">
+<meta property="og:description" content="Offensive security and infrastructure research — a breached infobot, transmitting from Veldin.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23090b11'/%3E%3Cpath d='M16 4l10 5.8v12.4L16 28 6 22.2V9.8z' fill='none' stroke='%23ff7a3c' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3.1' fill='%23ffb12e'/%3E%3C/svg%3E">
+<style>
+  :root{
+    box-sizing:border-box;
+    --bg:#070910;--bg-2:#0a0d16;--panel:#0b0f18;
+    --ink:#ede8da;--ink-soft:#c6cad4;--muted:#818ca3;--faint:#55637c;
+    --amber:#ffb12e;--amber-hi:#ffc866;--warp:#2fd6b4;--violet:#b78cff;--rust:#ff7a3c;--rust-dim:#b84f28;
+    --line:#1c2432;--line-soft:#2a3242;--redline:rgba(255,122,60,.42);--glow:rgba(255,122,60,.16);
+    --mono:"JetBrains Mono","SF Mono",ui-monospace,"Fira Code",Menlo,Consolas,monospace;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --maxw:980px;--pad:clamp(14px,3vw,34px);
+  }
+  *{box-sizing:inherit}
+  html,body{height:100%}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(900px 500px at 80% 6%, rgba(255,122,60,.06), transparent 62%),
+      radial-gradient(700px 480px at 12% 98%, rgba(155,108,255,.04), transparent 60%),
+      linear-gradient(var(--bg),var(--bg-2));}
+  .stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+  .scanlines{position:fixed;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.01) 0 1px,transparent 1px 3px);mix-blend-mode:overlay;opacity:.35}
+
+  .shell{position:relative;z-index:3;max-width:var(--maxw);margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:clamp(14px,3vw,30px) var(--pad) 0}
+  .top{flex:0 0 auto;display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;margin-bottom:14px}
+  .brand{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--ink);letter-spacing:.02em;white-space:nowrap}
+  .brand b{color:var(--amber)} .brand .cur{color:var(--rust);animation:blink 1.15s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .sysinfo{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .sysinfo .brk{color:var(--rust)} .sysinfo .os{color:var(--muted)} .sysinfo i{color:var(--line-soft);font-style:normal}
+
+  .term{flex:1;min-height:0;display:flex;flex-direction:column;background:rgba(9,7,8,.93);border:1px solid var(--redline);
+    border-radius:13px;overflow:hidden;box-shadow:0 26px 80px -50px #000, 0 0 70px -44px rgba(255,122,60,.55)}
+  .tbar{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:11px 15px;background:rgba(18,10,8,.9);border-bottom:1px solid var(--redline)}
+  .tbar .d{width:11px;height:11px;border-radius:50%}
+  .d.r{background:#ff7a3c}.d.y{background:#ffb12e}.d.g{background:#2fd6b4}
+  .tbar .tt{margin-left:10px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .tbar .tt b{color:var(--rust)}
+
+  .screen{flex:1;min-height:0;padding:16px clamp(15px,2.6vw,24px) 12px;font-family:var(--mono);font-size:13.5px;line-height:1.7;overflow-y:auto}
+  .screen::-webkit-scrollbar{width:9px} .screen::-webkit-scrollbar-thumb{background:var(--line-soft);border-radius:8px}
+  .ln{white-space:pre-wrap;word-break:break-word;margin:0}
+  .sp{height:9px}
+  .pr{color:var(--rust)} .cmd{color:var(--ink-soft)}
+  .cm{color:var(--faint)} .ok{color:var(--warp)} .fl{color:var(--amber)} .v{color:var(--ink-soft)}
+  .hl{color:var(--violet)} .rd{color:var(--rust)} .dim{color:var(--muted)} .gl{color:var(--rust);opacity:.85}
+  .load{color:var(--muted)} .load b{color:var(--rust);font-weight:400}
+  .h1{color:var(--amber);font-weight:700;font-size:14.5px;letter-spacing:.03em}
+  .lnk{color:var(--warp);text-decoration:none;border-bottom:1px solid transparent;transition:.15s;cursor:pointer}
+  .lnk:hover{color:var(--amber-hi);border-color:var(--amber)}
+  .eg{color:var(--violet);text-decoration:none;border-bottom:1px dotted var(--line-soft);cursor:pointer}
+  .eg:hover{color:var(--amber);border-color:var(--amber)}
+  .kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 18px;margin:3px 0}
+  .kv dt{color:var(--muted)} .kv dd{color:var(--ink-soft);margin:0}
+  .box{border:1px solid var(--line);border-left:2px solid var(--amber);border-radius:9px;padding:12px 14px;margin:6px 0 10px;background:rgba(255,177,46,.03)}
+  .box.cls{border-left-color:var(--rust);background:rgba(255,122,60,.04)}
+  .box .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .box .tag .c{color:var(--rust)}
+  .caret{display:inline-block;width:8px;height:1.05em;background:var(--rust);vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+
+  .inputline{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:10px clamp(15px,2.6vw,24px);font-family:var(--mono);font-size:13.5px;border-top:1px solid var(--redline);background:rgba(18,10,8,.6)}
+  .inputline .pr{color:var(--rust);white-space:nowrap}
+  .inputline input{flex:1;background:transparent;border:none;outline:none;color:var(--ink);font-family:var(--mono);font-size:13.5px;caret-color:var(--rust)}
+  .inputline input::placeholder{color:var(--faint)}
+
+  footer{flex:0 0 auto;padding:12px 2px 14px;font-family:var(--mono);font-size:11.5px;color:var(--faint);line-height:1.7}
+  .quote{font-family:var(--sans);font-style:italic;font-size:clamp(13px,2vw,15px);color:var(--amber)}
+  footer .sign{margin-top:3px} footer .sign .w{color:var(--warp)}
+  footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-soft)} footer a:hover{color:var(--amber);border-color:var(--amber)}
+
+  @media(prefers-reduced-motion:reduce){.brand .cur,.caret{animation:none}}
+  @media(max-width:560px){.sysinfo{font-size:11px}}
+</style>
+</head>
+<body>
+<!-- TROOPER-7: this infobot's been pinging veldin.dev for an hour. that normal? -->
+<!-- TROOPER-4: define normal. the Emperor approved this firmware personally. -->
+<canvas class="stars" aria-hidden="true"></canvas>
+<div class="scanlines" aria-hidden="true"></div>
+
+<main class="shell">
+  <div class="top">
+    <span class="brand">annoyingp0ny@<b>veldin</b>:~<span class="cur">&#9608;</span></span>
+    <span class="sysinfo">
+      <span class="os">infobot NX-7</span><i>&middot;</i>
+      <span>NefariOS 2.3</span><i>&middot;</i>
+      <span>/bin/surveil</span><i>&middot;</i>
+      <span class="brk">&#9679; link compromised</span><i>&middot;</i>
+      <span>up <span id="uptime">00:00</span></span>
+    </span>
+  </div>
+
+  <!-- TROOPER-7: it's got ONE password. for the whole dimension. -->
+  <!-- TROOPER-4: nobody's gonna break into a floating camera over Veldin. relax. -->
+  <section class="term" aria-label="breached infobot">
+    <div class="tbar">
+      <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+      <span class="tt">root@infobot &mdash; <b>breached session</b></span>
+    </div>
+    <div class="screen" id="screen" aria-live="polite"></div>
+    <div class="inputline">
+      <span class="pr">infobot $</span>
+      <input id="cmdin" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             aria-label="type a command" placeholder="type a command — try: help">
+    </div>
+  </section>
+
+  <footer>
+    <span class="quote">"Sometimes a small hero can take on a big problem."</span>
+    <div class="sign"><span class="w">veldin.dev</span> &middot; AnnoyingP0ny &middot; far edge of the Solana galaxy &middot; &copy; <span id="yr"></span> &middot;
+      <a href="https://github.com/AnnoyingP0ny" rel="noopener">github</a> &middot;
+      <a href="mailto:annoying@veldin.dev">mail</a> &middot;
+      <a href="./pgp.asc">pgp</a></div>
+  </footer>
+</main>
+
+<pre id="pgpkey" hidden aria-hidden="true">-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEasELrxYJKwYBBAHaRw8BAQdAeorZWyBrXcVkZnlzjb/aUiYB6EXQhrY8VUVM
+WzTEg060JEFubm95aW5nIFAwbnlzIDxhbm5veWluZ0B2ZWxkaW4uZGV2Poi1BBMW
+CgBdFiEEaJ/Rhw6fCWzG92+KWi7iZULB1a0FAmrBC68bFIAAAAAABAAObWFudTIs
+Mi41KzEuMTIsMCwzAhsBBQkDwmcABQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheA
+AAoJEFou4mVCwdWtHfsA/RKsfDZpllhpYL61KgUecIPf4zw2b/pq8mBeHTWiakBL
+AQCbhycym8c0OKitrtJFWkj4IJ3a2fHYamluW0qQ11F/B7gzBGrBC/cWCSsGAQQB
+2kcPAQEHQBq9f6BVznOc9ZFr6xGpQxALAIqWVrvbayogPraIH1z+iQERBBgWCgBC
+FiEEaJ/Rhw6fCWzG92+KWi7iZULB1a0FAmrBC/cbFIAAAAAABAAObWFudTIsMi41
+KzEuMTIsMCwzAhsCBQkB4TOAAIEJEFou4mVCwdWtdiAEGRYKAB0WIQQsY0FCzfeY
+udzkBKKxTs02EVIEFQUCasEL9wAKCRCxTs02EVIEFc68AP9I8EoLmucPOyt2U+Ie
+8xoiGEmNFxNv6m2TjqI1I4cZhAEA2h4/5ZteeitLkH7E/6ySQyGrBJn8cqUjK9d/
+pW43iwT7WAEAvR51gM3n5GOFS7/E/uQwSVDe1Q+lUoPeitKsOK4e8EQA/0RZVMdp
+SC0phDTLjGzUFqNXZSJKZrOZ4akRgSEQVZ0OuDgEasEL/BIKKwYBBAGXVQEFAQEH
+QGMOxqhLr38EemDRhNajSsvfWQlVzQrzPaKyRFpHWKVhAwEIB4iaBBgWCgBCFiEE
+aJ/Rhw6fCWzG92+KWi7iZULB1a0FAmrBC/wbFIAAAAAABAAObWFudTIsMi41KzEu
+MTIsMCwzAhsMBQkB4TOAAAoJEFou4mVCwdWtyIEA/2KvzEJDCVmh6vsLnWecy3SG
+XlSiezZZozYziJTdMW1YAP9/1OI6fJsJ6eb5VBlwJCPHQRm2UeI7hjJtYhi9scWw
+CbgzBGrBC/8WCSsGAQQB2kcPAQEHQDnARE1tJSHnLonx+vSE5TobV3X0AE5awhnG
++Rd5XaAIiJoEGBYKAEIWIQRon9GHDp8JbMb3b4paLuJlQsHVrQUCasEL/xsUgAAA
+AAAEAA5tYW51MiwyLjUrMS4xMiwwLDMCGyAFCQHhM4AACgkQWi7iZULB1a1U2QD8
+CPy8qi20HXlS1gBQa3FsiShp4ZhWYW+SWZ4+/cWb63gBAKl9XJK/79+utxkTAD5S
+yVSM8dKMquiq0f/HQFTRX78I
+=Ht3T
+-----END PGP PUBLIC KEY BLOCK-----</pre>
+
+<script>
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  var screenEl=document.getElementById('screen'), input=document.getElementById('cmdin'), busy=false;
+
+  var t0=Date.now();
+  setInterval(function(){var s=Math.floor((Date.now()-t0)/1000);document.getElementById('uptime').textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);},1000);
+
+  function node(h){var d=document.createElement('div');d.className='ln';d.innerHTML=h;return d;}
+  function out(h){screenEl.appendChild(node(h));sc();}
+  function gap(){var d=document.createElement('div');d.className='sp';screenEl.appendChild(d);sc();}
+  function sc(){screenEl.scrollTop=screenEl.scrollHeight;}
+  function kv(rows){return '<dl class="kv">'+rows.map(function(r){return '<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>';}).join('')+'</dl>';}
+  function eg(cmd,label){return '<span class="eg" data-cmd="'+cmd+'">'+(label||cmd)+'</span>';}
+
+  function typeCmd(cmd,cb){
+    var line=node('<span class="pr">infobot $</span> <span class="cmd"></span><span class="caret"></span>');
+    screenEl.appendChild(line);sc();
+    var span=line.querySelector('.cmd'),car=line.querySelector('.caret'),i=0;
+    (function t(){ if(i<=cmd.length){span.textContent=cmd.slice(0,i++);sc();setTimeout(t,24);} else {car.remove();cb&&cb();} })();
+  }
+
+  var LOADS={
+    assignment:'pulling the infobot&rsquo;s orders', profile:'reading the operator profile', services:'reading the subject&rsquo;s offerings',
+    clearances:'verifying the subject&rsquo;s clearances', contact:'extracting contact channels',
+    dossier:'decrypting a fragment', net:'checking the tap',
+    sys:'poking the Empire&rsquo;s locks', def:'bouncing the request through three dimensions'
+  };
+  function loadLine(kind,cb){
+    var msg=LOADS[kind]||LOADS.def;
+    var line=node('<span class="load">&rsaquo; <b>'+msg+'</b><span class="dots"></span></span>');
+    screenEl.appendChild(line);sc();
+    var dots=line.querySelector('.dots'),n=0;
+    var iv=setInterval(function(){n=(n+1)%4;dots.textContent='.'.repeat(n);sc();},150);
+    setTimeout(function(){clearInterval(iv);dots.textContent='';line.querySelector('.load').innerHTML+=' <span class="ok">done</span>';cb();},560);
+  }
+
+  function showKey(){
+    var raw=(document.getElementById('pgpkey')||{}).textContent||'';
+    out('<span class="cm"># ed25519 public key &middot; annoying@veldin.dev &mdash; copy it, pin it, verify the fingerprint out-of-band.</span>');
+    var pre=document.createElement('div'); pre.className='ln'; pre.style.color='var(--muted)'; pre.style.margin='6px 0';
+    pre.textContent=raw.trim(); screenEl.appendChild(pre); sc();
+    out('<span class="cm"># fingerprint &middot; <span class="dim">689F D187 0E9F 096C C6F7 6F8A 5A2E E265 42C1 D5AD</span></span>');
+  }
+
+  var DOSSIERS={
+    ratchet:{title:'RATCHET',classified:true,tease:'last Lombax, Veldin-born menace',rows:[
+      ['species','Lombax &mdash; last known, in his dimension'],['homeworld','Veldin, Solana Galaxy'],
+      ['role','mechanic turned galactic hero'],['loadout','OmniWrench + an arsenal that makes no financial sense']
+    ],note:'orphaned on a backwater planet, fixed a starship in a garage, saved the galaxy on the side. still can&rsquo;t walk past a broken machine.'},
+    clank:{title:'CLANK',classified:true,tease:'the defect that outsmarts everyone',rows:[
+      ['designation','defective warbot &middot; serial B5429-67'],['origin','a Blarg assembly line that made one too many'],
+      ['role','navigator, conscience, and the better half'],['perk','calm, precise, smarter than the whole room combined']
+    ],note:'the best defect ever manufactured. keeps the Lombax breathing and the plan intact, usually in the same move.'},
+    rivet:{title:'RIVET',classified:true,tease:'Resistance, the other dimension',rows:[
+      ['species','Lombax &mdash; the Emperor&rsquo;s dimension'],['base','a hidden workshop on Sargasso'],
+      ['role','Resistance fighter &middot; Ratchet&rsquo;s counterpart'],['loadout','hammer, blaster, one mechanical arm she earned the hard way']
+    ],note:'trusted machines about as far as she could throw them &mdash; then she met Kit, and threw the rule out instead.'},
+    kit:{title:'KIT',classified:true,tease:'reformed warbot, builds now',rows:[
+      ['designation','former Nefarious warbot, decommissioned by choice'],['role','Clank&rsquo;s counterpart &middot; Rivet&rsquo;s partner'],
+      ['status','pacifist &mdash; permanently, deliberately off-duty']
+    ],note:'built to flatten cities. chose to stop. carries the weight so nobody else has to, and builds instead of breaks.'},
+    vox:{title:'GLEEMAN VOX',classified:true,tease:'DreadZone&rsquo;s ringmaster',rows:[
+      ['title','media mogul &middot; owner of DreadZone'],['operation','the Shadow Sector &mdash; an illegal gladiatorial broadcast'],
+      ['method','abduct heroes, make them fight live, sell the ad breaks'],['license','<span class="rd">REVOKED</span> <span class="cm">(posthumously)</span>']
+    ],note:'the one villain who&rsquo;d end you and cut to commercial over the footage. ratings over lives &mdash; right up until the ratings ended him.'},
+    arena:{title:'THE SHADOW SECTOR CIRCUIT',classified:true,tease:'the DreadZone battlecourses',rows:[
+      ['venue','DreadZone Station &mdash; battlecourses scattered across the Shadow Sector'],
+      ['event','Exterminators vs hordes, bosses, and each other &mdash; all for the ratings'],
+      ['team','&ldquo;Team Darkstar&rdquo; &mdash; one Lombax, two combat bots, zero consent'],
+      ['objective','official: entertain. actual: survive, win, and drop the whole set on Vox&rsquo;s head'],
+      ['outcome','broadcast terminated &middot; host unavailable for comment']
+    ],note:'leaked for the record. the Shadow Sector never advertises its exits &mdash; so somebody had to.'}
+  };
+  var DORDER=['ratchet','clank','rivet','kit','vox','arena'];
+  DOSSIERS.annoyingp0ny={title:'AnnoyingP0ny',self:true,rows:[
+    ['designation','AnnoyingP0ny'],
+    ['classification','person of interest &middot; Resistance-adjacent'],
+    ['base','Veldin, Solana Galaxy'],
+    ['discipline','offensive security &amp; infrastructure'],
+    ['offers','<span class="eg" data-cmd="services">red team &middot; pentest &middot; reverse eng &middot; code review &middot; infra &amp; labs</span>'],
+    ['clearance','CRTO &mdash; ZeroPoint Security'],
+    ['standing order','<span class="rd">LOCATE &amp; DETAIN</span> &mdash; all units, every dimension'],
+    ['last coordinates','Veldin &middot; sector 7G &middot; <span class="cm">(trail cold. again.)</span>'],
+    ['contact','<span class="eg" data-cmd="contact">annoying@veldin.dev</span>']
+  ],note:'the Empire files this one under &ldquo;locate &amp; detain.&rdquo; he files it under &ldquo;open for work.&rdquo;'};
+
+  function garble(w){ if(w.length<3) return w; var i=Math.floor(w.length/2); return w.slice(0,i)+'<span class="gl">\u2588</span>'+w.slice(i+1); }
+  function dossierRows(){ return DORDER.map(function(k){ var d=DOSSIERS[k]; return [eg('dossier '+k, garble(k)), '<span class="dim">'+d.tease+'</span>']; }); }
+  function renderDossier(key){
+    var d=DOSSIERS[key];
+    if(!d){ out('<span class="rd">dossier:</span> no file under that name. the cache keeps its own index.'); return; }
+    var tag=d.self?'<span class="tag">&#9670; subject file</span>'
+          :'<span class="tag"><span class="c">&#9632; classified</span> &middot; intercepted file</span>';
+    out('<div class="box'+(d.self?'':' cls')+'">'+tag+'<div class="h1">'+d.title+'</div>'+kv(d.rows)+
+        (d.note?'<div class="cm" style="margin-top:7px">'+d.note+'</div>':'')+'</div>');
+  }
+  function dossiersList(){
+    out('<span class="dim">cache index &mdash; '+DORDER.length+' files &middot; <span class="rd">classified</span> &middot; integrity 48%:</span>');
+    out(kv(dossierRows()));
+    out('<span class="cm"># fragments only. pull one if you can read it: <span class="fl">dossier &lt;name&gt;</span></span>');
+  }
+
+  var CMDS={
+    assignment:{load:'assignment',run:function(){
+      out('<span class="h1">ASSIGNMENT</span> <span class="dim">// Nefarious Empire &middot; Surveillance Directorate</span>'); gap();
+      out(kv([
+        ['order no.','NX-7-1337'],
+        ['authority','the Emperor&rsquo;s Assistant, by order of His Eminence'],
+        ['target','AnnoyingP0ny &mdash; person of interest, Resistance-adjacent'],
+        ['last fix','Veldin &middot; sector 7G &mdash; signal lost on approach'],
+        ['objective','<span class="rd">LOCATE &amp; REPORT</span> &middot; observe only, flag for detention'],
+        ['priority','<span class="rd">HIGH</span> &mdash; subject undermines Imperial infrastructure faster than it is built'],
+        ['prior units','3 dispatched &middot; 3 reassigned to Zordoom &mdash; <span class="cm">for losing him</span>']
+      ])); gap();
+      out('<span class="rd">unit status: &ldquo;TEMPORARILY REALLOCATED&rdquo;</span> <span class="cm"># Empire-speak for <span class="rd">breached</span>. His Eminence does not acknowledge losses &mdash; only strategic silences.</span>'); gap();
+      out('<span class="cm"># while the Directorate rehearses its silence, read what the unit kept: <span class="eg" data-cmd="profile">profile</span> &middot; <span class="eg" data-cmd="services">services</span> &middot; <span class="eg" data-cmd="help">help</span></span>');
+    }},
+    profile:{load:'profile',run:function(){
+      out('<span class="h1">AnnoyingP0ny</span> <span class="dim">&mdash; offensive security &amp; infrastructure researcher</span>'); gap();
+      out(kv([
+        ['focus','red team &middot; web &amp; app security &middot; reverse engineering'],
+        ['builds','labs, dynamic ranges &amp; the automation the work runs on'],
+        ['reviews','application &amp; infrastructure code, before it ships'],
+        ['agents','automation put to work only where it earns its keep'],
+        ['defense','turns every finding into a detection that sticks']
+      ])); gap();
+      out('<span class="cm"># the fatal flaw is never the superweapon &mdash; it&rsquo;s the <span class="hl">one bolt its builder forgot to tighten</span>.</span>');
+      out('<span class="cm"># he gets there first. <span class="rd">before the countdown does.</span></span>');
+    }},
+    whoami:{run:function(){ out('<span class="v">root</span> <span class="cm"># on this infobot, at least. the name it was hunting is in its <span class="fl">assignment</span> &mdash; not yours.</span>'); }},
+    services:{load:'services',run:function(){
+      out('<span class="dim"># what the subject takes on &mdash; and what he&rsquo;ll break for you.</span>'); gap();
+      out('<span class="fl">offensive</span>');
+      out(kv([
+        ['red team','full-chain adversary emulation, C2 &amp; evasion'],
+        ['pentest','web &middot; app &middot; API &middot; network &middot; cloud'],
+        ['reverse eng','binaries, firmware, protocols &mdash; crashes into primitives']
+      ])); gap();
+      out('<span class="fl">build &amp; review</span>');
+      out(kv([
+        ['code review','app &amp; infra code, threat-modelled, before it ships'],
+        ['infra','hardening, segmentation, hypervisor &amp; VDI estates'],
+        ['labs','dynamic ranges &amp; automation, stood up as code']
+      ])); gap();
+      out('<span class="fl">defense</span>');
+      out(kv([
+        ['detection eng','every finding becomes a detection that sticks'],
+        ['purple team','prove the coverage, cut the noise defenders drown in']
+      ])); gap();
+      out('<span class="fl">specials</span> <span class="dim">(Veldin rates)</span>');
+      out(kv([
+        ['infobot hardening','so the next intruder can&rsquo;t do... <span class="cm">this</span>'],
+        ['deplanetizer audit','we find the loose bolt before the countdown'],
+        ['warbot code review','turn a city-flattener into a pacifist &mdash; ask Kit']
+      ])); gap();
+      out('<span class="cm"># bring him what keeps you up at night &rarr; <span class="eg" data-cmd="contact">contact</span></span>');
+    }},
+    clearances:{load:'clearances',run:function(){
+      out('<span class="dim"># field clearances &mdash; earned on the range, not pulled out of a Gadgetron cereal box.</span>'); gap();
+      out('<div class="box"><span class="tag">&#9670; verified clearance</span>'+
+        '<div class="h1">CRTO <span class="dim" style="font-weight:400">&mdash; Certified Red Team Operator</span></div>'+
+        kv([['issuer','ZeroPoint Security'],['issued','14 Dec 2022'],['status','<span class="ok">verified &#10003;</span>']])+
+        '<div style="margin-top:8px"><span class="lnk" data-href="https://badges.parchment.eu/public/assertions/Bo--Z3dHTPCtdaNMl3AvYQ">&#8599; verify clearance</span></div></div>');
+      out('<span class="cm"># more inbound. the range never really closes.</span>');
+    }},
+    contact:{load:'contact',run:function(){
+      out('<span class="cm"># spotted a crack in somebody&rsquo;s armor? open a channel. encrypt anything that bites.</span>'); gap();
+      out(kv([
+        ['github','<span class="lnk" data-href="https://github.com/AnnoyingP0ny">github.com/AnnoyingP0ny</span>'],
+        ['mail','<span class="lnk" data-href="mailto:annoying@veldin.dev">annoying@veldin.dev</span>'],
+        ['pgp','<span class="lnk" data-href="./pgp.asc">./pgp.asc</span> <span class="cm">&middot; ed25519 &middot; <span class="fl">cat pgp.asc</span> to read it here</span>'],
+        ['fpr','<span class="dim">689F D187 0E9F 096C C6F7 6F8A 5A2E E265 42C1 D5AD</span>']
+      ])); gap();
+      out('<span class="cm"># plaintext exploits sent cold get the Qwark treatment: <span class="hl">a lot of nodding, no actual reply</span>.</span>');
+    }},
+    net:{load:'net',run:function(){
+      out('<span class="dim"># breach link &mdash; our tap into the infobot.</span>'); gap();
+      out(kv([
+        ['target','Empire infobot NX-7 &middot; drifting over Veldin'],
+        ['access','<span class="ok">root</span> &middot; we own it <span class="cm">(for now)</span>'],
+        ['link','<span class="ok">stable</span> &middot; 2 hops, 0 logs left behind'],
+        ['operator','AnnoyingP0ny <span class="cm">&mdash; src: veldin.dev</span>'],
+        ['the Empire','still thinks this camera works']
+      ]));
+    }},
+    help:{run:function(){
+      out('<span class="dim">available commands</span>');
+      out(kv([
+        ['assignment','what the Empire sent this infobot to do'],
+        ['profile','who I am &amp; what I focus on'],
+        ['services','what he takes on &mdash; and what he&rsquo;ll break'],
+        ['clearances','verified field certifications'],
+        ['contact','open a secure channel'],
+        ['net','the breach link &amp; operator'],
+        ['ls','list the infobot&rsquo;s files'],
+        ['connect','re-sync the tap <span class="cm">(or just reload)</span>'],
+        ['clear','wipe the screen']
+      ]));
+      out('<span class="cm"># this infobot kept files on more than just you. go looking.</span>');
+    }},
+    ls:{run:function(a){
+      var t=(a[0]||'').toLowerCase().replace(/\/$/,'');
+      if(t==='dossiers'){ out('<span class="rd">ls:</span> dossiers/ is sealed by the cache. it answers to its own name, not to ls.'); return; }
+      if(t){ out('<span class="rd">ls:</span> <span class="v">'+t.replace(/[<>&]/g,'')+'</span>: not on this unit.'); return; }
+      out('<span class="v">subject.annoyingp0ny</span>   <span class="fl">dossiers/</span>   <span class="v">pgp.asc</span>');
+      out('<span class="cm"># subject file is you (<span class="fl">dossier annoyingp0ny</span>). dossiers/ is the Empire&rsquo;s collection. pgp.asc it grabbed off the wire.</span>');
+    }},
+    dossiers:{run:function(a){
+      if((a[0]||'').toLowerCase()==='list'){ loadLine('dossier',function(){gap();dossiersList();gap();busy=false;input.focus();}); return 'async'; }
+      out('<span class="dim">dossiers &mdash; the infobot&rsquo;s surveillance cache.</span>');
+      out(kv([['dossiers list','the cache index'],['dossier &lt;name&gt;','pull a single file']]));
+    }},
+    dossier:{run:function(a){
+      var n=(a[0]||'').toLowerCase();
+      if(n==='me'||n==='self'||n==='subject'){ n='annoyingp0ny'; }
+      if(!n){ out('<span class="rd">dossier:</span> name a file &mdash; the cache keeps the index.'); return; }
+      return {load:'dossier',then:function(){ renderDossier(n); }};
+    }},
+    connect:{run:function(){ out('<span class="cm"># re-syncing the tap &mdash; dropping this session...</span>'); setTimeout(function(){location.reload();},620); return 'async'; }},
+
+    id:{run:function(){ out('<span class="v">uid=0(root) gid=0(root)</span> <span class="cm"># you kicked the door off the hinges. root on Empire hardware.</span>'); }},
+    groups:{run:function(){ out('<span class="v">root infobot empire(borrowed)</span> <span class="cm"># borrowed credentials. don&rsquo;t get comfortable.</span>'); }},
+    pwd:{run:function(){ out('<span class="v">/empire/surveillance/veldin/subject-annoyingp0ny</span> <span class="cm"># the Empire filed you neatly. rude.</span>'); }},
+    uname:{run:function(){ out('<span class="v">NefariOS 2.3 (Nefarious Empire)</span> <span class="cm">&mdash; kernel: Troopa &middot; shell: /bin/surveil &middot; not ours, we just live here now.</span>'); }},
+    cat:{run:function(a){
+      var f=(a[0]||'').toLowerCase().replace('./','');
+      if(f==='pgp.asc'||f==='pgp.txt'){ showKey(); return; }
+      if(f==='subject.annoyingp0ny'||f==='subject'){ return {load:'dossier',then:function(){ renderDossier('annoyingp0ny'); }}; }
+      if(f===''){ out('<span class="rd">cat:</span> name a file. try <span class="fl">ls</span>.'); return; }
+      out('<span class="rd">cat:</span> <span class="v">'+f.replace(/[<>&]/g,'')+'</span> is sealed by the cache. try <span class="fl">ls</span>.');
+    }},
+    sudo:{load:'sys',run:function(){ out('<span class="rd">sudo:</span> you&rsquo;re already root &mdash; you kicked the door off the hinges, remember?'); }},
+    su:{load:'sys',run:function(){ out('<span class="rd">su:</span> there&rsquo;s one session on this unit, and it&rsquo;s yours. for now.'); }},
+    cd:{load:'sys',run:function(){ out('<span class="rd">cd:</span> this infobot only has one directory worth reading, and you&rsquo;re standing in it.'); }},
+    rm:{run:function(){ out('<span class="rd">rm:</span> tempting. but a dead infobot files a missing-unit report. leave it looking alive.'); }},
+    nano:{run:function(){ out('<span class="cm">read-only tap. touch nothing, leave nothing.</span>'); }},
+    man:{run:function(){ out('<span class="cm">man: read the wrench. it&rsquo;s self-documenting.</span>'); }},
+    exit:{run:function(){ out('<span class="cm">you don&rsquo;t walk out of a breach. type <span class="fl">connect</span> to re-sync &mdash; or close the tab like a civilian.</span>'); }}
+  };
+  CMDS.disconnect=CMDS.exit; CMDS.logout=CMDS.exit; CMDS.quit=CMDS.exit; CMDS.reconnect=CMDS.connect;
+  CMDS.bio=CMDS.profile; CMDS.details=CMDS.profile; CMDS.about=CMDS.profile; CMDS.hire=CMDS.services; CMDS.offer=CMDS.services; CMDS.group=CMDS.groups; CMDS.status=CMDS.net; CMDS.ifconfig=CMDS.net; CMDS.vi=CMDS.nano; CMDS.vim=CMDS.nano; CMDS.less=CMDS.cat; CMDS.bat=CMDS.cat;
+
+  function execCmd(raw){
+    var parts=(raw||'').trim().split(/\s+/), cmd=(parts[0]||'').toLowerCase(), args=parts.slice(1);
+    if(cmd==='clear'){screenEl.innerHTML='';busy=false;return;}
+    if(cmd===''){busy=false;return;}
+    var entry=CMDS[cmd], done=function(){ gap(); busy=false; input.focus(); };
+    if(!entry){
+      out('<span class="rd">command not found:</span> <span class="v">'+cmd.replace(/[<>&]/g,'')+'</span>');
+      out('<span class="cm"># type <span class="fl">help</span> for the list.</span>'); done(); return;
+    }
+    var fire=function(){
+      var r=entry.run(args);
+      if(r==='async'){ return; }
+      if(r&&r.load){ loadLine(r.load,function(){ gap(); r.then(); done(); }); return; }
+      done();
+    };
+    if(entry.load){ loadLine(entry.load,function(){ gap(); fire(); }); }
+    else { fire(); }
+  }
+  function dispatch(raw,echo){
+    if(busy) return; busy=true;
+    if(echo){ typeCmd((raw||'').trim(), function(){ execCmd(raw); }); } else { execCmd(raw); }
+  }
+
+  screenEl.addEventListener('click',function(e){
+    var g=e.target.closest('.eg'); if(g){ dispatch(g.dataset.cmd,true); return; }
+    var lk=e.target.closest('.lnk'); if(lk&&lk.dataset.href){ window.open(lk.dataset.href, lk.dataset.href.indexOf('mailto')===0?'_self':'_blank','noopener'); }
+  });
+  input.addEventListener('keydown',function(e){ if(e.key==='Enter'){var v=input.value;input.value='';dispatch(v,true);} });
+  document.querySelector('.term').addEventListener('click',function(e){ if(!e.target.closest('a,.lnk,.eg')&&!window.getSelection().toString()) input.focus(); });
+
+  (function boot(){
+    var lines=[
+      '<span class="cm"># tapping Empire infobot NX-7, drifting over Veldin...</span>',
+      '<span class="ok">[+]</span> in. the infobot didn&rsquo;t even flinch &mdash; trooper-grade auth, one password for the whole dimension.',
+      '<span class="ok">[+]</span> firmware NefariOS 2.3, last patched never. the Empire files that under <span class="cm">&ldquo;stable.&rdquo;</span>',
+      '<span class="ok">[+]</span> propaganda banner suppressed <span class="cm">(&ldquo;ALL HAIL EMPEROR NEFARIOUS&rdquo; &mdash; we&rsquo;ve read quite enough)</span>',
+      '<span class="ok">[+]</span> onboard self-destruct located... and quietly unplugged. His Eminence will not be informed.',
+      '<span class="ok">[+]</span> surveillance cache mounted &middot; decrypting its standing orders.',
+      '<span class="cm"># the orders are still loaded. here is what the Empire sent it to do:</span>'
+    ];
+    var i=0;
+    (function n(){ if(i<lines.length){out(lines[i++]);setTimeout(n,320);} else {setTimeout(function(){dispatch('assignment',true);},320);} })();
+  })();
+
+  (function(){
+    var c=document.querySelector('.stars'),x=c.getContext('2d'),w,h,stars;
+    var pal=['255,177,46','255,122,60','183,140,255','47,214,180'];
+    function size(){w=c.width=innerWidth;h=c.height=innerHeight;var n=Math.min(120,Math.round(w*h/16000));stars=[];
+      for(var i=0;i<n;i++)stars.push({x:Math.random()*w,y:Math.random()*h,z:Math.random()*.8+.2,p:Math.random()*6.28,col:pal[Math.random()<.14?1:(Math.random()<.06?2:(Math.random()<.5?0:3))]});}
+    function tick(t){x.clearRect(0,0,w,h);for(var i=0;i<stars.length;i++){var s=stars[i];var a=(.25+.75*Math.abs(Math.sin(s.p+t/1000)))*s.z;x.fillStyle='rgba('+s.col+','+(a*.45)+')';var r=s.z*1.3;x.fillRect(s.x,s.y,r,r);}requestAnimationFrame(tick);}
+    size();requestAnimationFrame(tick);addEventListener('resize',size,{passive:true});
+  })();
+  // TROOPER-4: ...the session light is red. that's fine, right? ...TROOPER-7? ...i'm getting coffee.
+</script>
+</body>
+</html>
